@@ -61,4 +61,6 @@ jobs:
                - **Propuesta de solución:** pasos claros.
                - **Riesgos / efectos secundarios:** p. ej. HUD, tamaño de canvas, lifecycle.
                - **Info faltante:** preguntas para quien reportó (si aplica).
+               El comentario debe estar en formato Markdown que GitHub pueda entender (GitHub Flavored Markdown válido:
+               encabezados, listas, negritas y bloques de código con ``` bien cerrados) para que se renderice correctamente.
             5. Si el issue es ambiguo, dilo en el diagnóstico en vez de inventar detalles.
