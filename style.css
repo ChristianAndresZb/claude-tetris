@@ -235,3 +235,21 @@ kbd {
 #restart-btn:hover {
   background: var(--btn-hover-bg);
 }
+
+/* ---- Skins ---- */
+#skin-select {
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  color: var(--toggle-text);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Neon forces a black board in both light and dark themes */
+body.skin-neon #board,
+body.skin-neon #next-canvas {
+  background: #000;
+  border-color: #2a2a4a;
+}
