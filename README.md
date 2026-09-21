@@ -84,7 +84,9 @@ Después abre `http://localhost:8000` en el navegador.
 | `↑` o `X` | Rotar la pieza en sentido horario |
 | `↓`       | Soft drop (bajar más rápido)      |
 | `Espacio` | Hard drop (caída instantánea)     |
-| `P`       | Pausar / reanudar                 |
+| `P` / `Esc` | Pausar / reanudar (abre el menú de pausa) |
+
+El menú de pausa ofrece **Reanudar**, **Reiniciar**, **Ver controles** y **Nivel inicial** (1–10, se guarda y se aplica a la siguiente partida). Mientras está abierto, las teclas de juego están bloqueadas.
 
 ---
 

@@ -47,9 +47,16 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeToggleBtn = document.getElementById('theme-toggle');
+const pauseOverlay = document.getElementById('pause-overlay');
+const resumeBtn = document.getElementById('resume-btn');
+const pauseRestartBtn = document.getElementById('pause-restart-btn');
+const controlsBtn = document.getElementById('controls-btn');
+const controlsPanel = document.getElementById('controls-panel');
+const startLevelSelect = document.getElementById('start-level');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 let theme = 'dark';
+let startLevel = 1;
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -115,7 +122,7 @@ function clearLines() {
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
-    level = Math.floor(lines / 10) + 1;
+    level = startLevel + Math.floor(lines / 10);
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
     updateHUD();
   }
@@ -262,9 +269,11 @@ function togglePause() {
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
-    overlayTitle.textContent = 'PAUSA';
-    overlayScore.textContent = '';
-    overlay.classList.remove('hidden');
+  }
+  pauseOverlay.classList.toggle('hidden', !paused);
+  if (!paused) {
+    controlsPanel.classList.add('hidden');
+    controlsBtn.setAttribute('aria-expanded', 'false');
   }
 }
 
@@ -289,22 +298,65 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  startLevel = loadStartLevel();
+  level = startLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = Math.max(100, 1000 - (level - 1) * 90);
   dropAccum = 0;
   lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  pauseOverlay.classList.add('hidden');
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
+// Start level for the NEXT game, persisted in localStorage (clamped 1-10, default 1)
+function loadStartLevel() {
+  try {
+    const n = parseInt(localStorage.getItem('startLevel'), 10);
+    return Number.isNaN(n) ? 1 : Math.min(10, Math.max(1, n));
+  } catch (err) {
+    return 1;
+  }
+}
+
+function saveStartLevel(n) {
+  try { localStorage.setItem('startLevel', String(n)); } catch (err) { /* storage unavailable */ }
+}
+
+// Buttons must not keep focus, or Space/Enter would re-trigger them after resuming
+function bindMenuButton(btn, fn) {
+  btn.addEventListener('click', () => { btn.blur(); fn(); });
+}
+
+bindMenuButton(resumeBtn, togglePause);
+bindMenuButton(pauseRestartBtn, init);
+bindMenuButton(controlsBtn, () => {
+  const open = controlsPanel.classList.toggle('hidden') === false;
+  controlsBtn.setAttribute('aria-expanded', String(open));
+});
+startLevelSelect.value = String(loadStartLevel());
+startLevelSelect.addEventListener('change', () => {
+  saveStartLevel(parseInt(startLevelSelect.value, 10));
+  startLevelSelect.blur();
+});
+
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') {
+    if (e.repeat) return;
+    if (!gameOver) e.preventDefault();
+    togglePause();
+    return;
+  }
+  // menu open: swallow game keys so the page/buttons don't react
+  if (paused && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(e.code) &&
+      e.target !== startLevelSelect) {
+    e.preventDefault();
+  }
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
