@@ -27,6 +27,8 @@
   --toggle-bg: #22223a;
   --toggle-border: #3a3a5a;
   --toggle-text: #e0e0e0;
+  --highlight-bg: rgba(255, 213, 79, 0.2);
+  --highlight-text: #ffd54f;
 }
 
 body.light-theme {
@@ -52,6 +54,8 @@ body.light-theme {
   --toggle-bg: #e4e4ef;
   --toggle-border: #c8c8d8;
   --toggle-text: #1a1a25;
+  --highlight-bg: rgba(201, 140, 0, 0.18);
+  --highlight-text: #8a5d00;
 }
 
 body {
@@ -234,4 +238,112 @@ kbd {
 
 #restart-btn:hover {
   background: var(--btn-hover-bg);
+}
+
+/* ---- Records + pantalla de inicio ---- */
+#start-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 10px;
+  color: var(--title-color);
+  text-shadow: 0 0 20px var(--title-glow);
+}
+
+.records {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.records.hidden,
+.name-row.hidden {
+  display: none;
+}
+
+.records-title {
+  font-size: 12px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  color: var(--label-color);
+}
+
+.records-empty,
+.records-stats {
+  font-size: 12px;
+  color: var(--control-text);
+}
+
+.records-table {
+  border-collapse: collapse;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  color: var(--overlay-score-color);
+}
+
+.records-table td {
+  padding: 3px 8px;
+  text-align: left;
+}
+
+.records-table td:last-child {
+  text-align: right;
+}
+
+.records-table tr.highlight {
+  background: var(--highlight-bg);
+  color: var(--highlight-text);
+  font-weight: 700;
+}
+
+.name-row {
+  display: flex;
+  gap: 8px;
+}
+
+#player-name {
+  width: 130px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--toggle-border);
+  background: var(--toggle-bg);
+  color: var(--toggle-text);
+  font-size: 13px;
+  user-select: text;
+}
+
+#play-btn,
+#save-score-btn,
+.secondary-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+#save-score-btn {
+  padding: 6px 14px;
+}
+
+#play-btn:hover,
+#save-score-btn:hover {
+  background: var(--btn-hover-bg);
+}
+
+.secondary-btn {
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  color: var(--toggle-text);
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
+.secondary-btn:hover {
+  background: var(--kbd-border);
 }
