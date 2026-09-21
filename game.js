@@ -299,6 +299,7 @@ function init() {
   score = 0;
   lines = 0;
   startLevel = loadStartLevel();
+  startLevelSelect.value = String(startLevel);
   level = startLevel;
   paused = false;
   gameOver = false;
@@ -348,6 +349,8 @@ startLevelSelect.addEventListener('change', () => {
 document.addEventListener('keydown', e => {
   if (e.code === 'KeyP' || e.code === 'Escape') {
     if (e.repeat) return;
+    // Esc closes an open native dropdown; don't resume in that case
+    if (e.code === 'Escape' && e.target === startLevelSelect) return;
     if (!gameOver) e.preventDefault();
     togglePause();
     return;
