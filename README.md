@@ -174,6 +174,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `ROWS`         | Filas del tablero                        | `20`                  |
 | `BLOCK`        | Tamaño en píxeles de cada celda          | `30`                  |
 | `COLORS`       | Paleta de colores por tipo de pieza      | 7 colores             |
+| `SKINS`        | Skins visuales: paleta + función de dibujo (Retro, Neón, Pastel, Pixel art); se elige en el selector junto al título y se guarda en `localStorage` (`skin`) | `retro` |
 | `LINE_SCORES`  | Puntos por 1, 2, 3 o 4 líneas eliminadas | `[0,100,300,500,800]` |
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 
