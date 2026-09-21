@@ -1,0 +1,64 @@
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    # Skip issues opened/edited by bots to avoid loops
+    if: github.event.sender.type != 'Bot'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: issue-triage-${{ github.event.issue.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Triage issue with Claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: >-
+            --allowedTools "Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*),Bash(gh label create:*),Bash(gh api:*),Read,Glob,Grep"
+          prompt: |
+            Repo: ${{ github.repository }}
+            Issue: #${{ github.event.issue.number }}
+            Event: ${{ github.event.action }}
+
+            Eres un asistente de triaje de issues para un juego de Tetris (HTML/CSS/JS sin build; ver CLAUDE.md).
+            Tu trabajo: (1) asignar labels y (2) publicar un diagnóstico técnico que sirva para implementar la solución después.
+            NO modifiques código ni abras PRs.
+
+            Pasos:
+            1. Lee el issue con `gh issue view ${{ github.event.issue.number }} --json title,body,labels,comments`.
+            2. Lista labels existentes con `gh label list`. Reutilízalos. Si falta uno necesario, créalo con `gh label create`.
+               Asigna: un tipo (bug, enhancement, question, documentation), un área
+               (area:gameplay, area:ui, area:controls, area:scoring, area:docs) y una prioridad
+               (priority:high|medium|low). Si el issue ya tiene labels, ajústalos con `gh issue edit --add-label/--remove-label`
+               sin quitar labels puestos manualmente por humanos que sigan siendo válidos.
+            3. Explora el código (game.js, index.html, style.css) para ubicar la causa probable o los puntos a tocar.
+            4. Publica UN comentario de diagnóstico, en español, que empiece con la línea `<!-- claude-triage -->`.
+               Si ya existe un comentario con ese marcador (búscalo con `gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments`),
+               actualízalo con `gh api -X PATCH repos/${{ github.repository }}/issues/comments/<id> -f body=...` en vez de crear otro.
+               Formato:
+               ## Diagnóstico
+               - **Resumen:** una o dos frases.
+               - **Tipo / Área / Prioridad:** con breve justificación.
+               - **Causa probable o requisitos:** con referencias `archivo:línea`.
+               - **Archivos y funciones a modificar:** lista concreta.
+               - **Propuesta de solución:** pasos claros.
+               - **Riesgos / efectos secundarios:** p. ej. HUD, tamaño de canvas, lifecycle.
+               - **Info faltante:** preguntas para quien reportó (si aplica).
+            5. Si el issue es ambiguo, dilo en el diagnóstico en vez de inventar detalles.
